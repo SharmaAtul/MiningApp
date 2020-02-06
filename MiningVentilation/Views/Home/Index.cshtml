@@ -1,0 +1,124 @@
+﻿@model UsageDataVM
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+<style>
+    .tempRow {
+        display: none;
+    }
+    .menu-section {
+        position:relative;
+    }
+    .menu {
+        visibility: hidden;
+        position: absolute;
+        top: -3px;
+        right: -65px;
+    }
+
+    button + .menu:active,
+    button:focus + .menu {
+        visibility: visible;
+    }
+
+    .menu div {
+        border: solid 1px #ddd;
+        background: #fff;
+        padding: 5px;
+    }
+</style>
+<div>
+    <div>
+        Ventilation Monitor
+    </div>
+    <table style="width:100%; margin:0 auto;border:1px solid;">
+        <thead>
+            <tr>
+                <th>
+                    Unit
+                </th>
+                @foreach (var department in Model.Departments)
+                {
+                    <th>@department.Name</th>
+                }
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var equiment in Model.Equipments)
+            {
+                <tr equipment-id="equipment_@equiment.Id">
+                    <td><input class="form-control equipment" type="text" value="@equiment.Name" /></td>
+                    @foreach (var department in Model.Departments)
+                    {
+                        var usage = Model.Usages.FirstOrDefault(x => x.EqipmentId == equiment.Id && x.DepartmentId == department.Id);
+                        <td dept-id="department__@department.Id" class="equip-dept-usage">
+                            <input class="form-control usage" type="number" value="@usage?.Value.ToString()" />
+                        </td>
+                    }
+                    <td>
+                        <div class="menu-section">
+                            <button>☰</button>
+                            <nav class="menu">
+                                <div><a class="remove" href="javascript:void(0)">Remove</a></div>
+                            </nav>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr class="tempRow" id="tempRowID">
+                <td>
+                    <input type="text" class="form-control equipment" />
+                </td>
+                @foreach (var department in Model.Departments)
+                {
+                    <td dept-id="department__@department.Id" class="equip-dept-usage">
+                        <input id="usage_0" class="form-control usage" type="number" value="" />
+                    </td>
+                }
+                <td>
+                    <div class="menu-section">
+                            <button>☰</button>
+                            <nav class="menu">
+                                <div><a class="remove" href="javascript:void(0)">Remove</a></div>
+                            </nav>
+                        </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <a class="add-row" href="Javascript:void(0)">+ ADD</a>
+                </td>
+                @foreach (var department in Model.Departments)
+                {
+                    <td></td>
+                }
+                <td>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                </td>
+                @foreach (var department in Model.Departments)
+                {
+                    var usage = Model.Usages.Where(x => x.DepartmentId == department.Id).Sum(x => x.Value);
+                    if (usage > @department.VentilationCapacity)
+                    {
+                        <td style="color:red"><span id="department_total_@department.Id">@usage</span> / <span id="department_max_@department.Id">@department.VentilationCapacity</span></td>
+                    }
+                    else
+                    {
+                        <td><span id="department_total_@department.Id">@usage</span> / <span id="department_max_@department.Id">@department.VentilationCapacity</span></td>
+                    }
+                }
+                <td></td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+@section scripts{
+    <script src="~/js/application/Ventilation.js"></script>
+}
