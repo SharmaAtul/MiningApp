@@ -44,6 +44,11 @@ $(function () {
                 success: function (data) {
                     if (data.status) {
                         $(currEquipment).remove();
+
+                        $(".total-usage").each(function () {
+                            $(this).text(0);
+                        });
+
                         for (var i = 0; i <= data.departmentUsage.length - 1; i++) {
                             var deptId = data.departmentUsage[i].departmentId;
                             var usage = data.departmentUsage[i].value;
